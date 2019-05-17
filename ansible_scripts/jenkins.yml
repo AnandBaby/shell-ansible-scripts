@@ -1,0 +1,29 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+   - name: add repo for java 8
+     apt_repository: repo='ppa:webupd8team/java' state=present
+  
+   - name: set licence selected
+     shell: /bin/echo debconf shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+  
+   - name: set licence seen
+     shell: /bin/echo debconf shared/accepted-oracle-license-v1-1 seen true | /usr/bin/debconf-set-selections
+   
+   - name:
+     apt: name=oracle-java8-installer update_cache=yes force=yes
+
+   - name: ensure the jenkins apt repository key is installed
+     apt_key: url=https://pkg.jenkins.io/debian-stable/jenkins.io.key state=present
+    
+
+   - name: ensure the repository is configured
+     apt_repository: repo='deb https://pkg.jenkins.io/debian-stable binary/' state=present
+      
+   - name: ensure jenkins is installed
+     apt: name=jenkins update_cache=yes
+     
+   - name: ensure jenkins is running
+     service: name=jenkins state=started
+  

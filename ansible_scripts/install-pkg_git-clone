@@ -1,0 +1,21 @@
+---
+- name: configure application
+  hosts: all
+  become: 
+  become_method: sudo
+  vars:
+      repository_url: 'https://username:password@git-link'
+      repository_path: /home/path
+
+  tasks:
+    - name: install packages
+      apt: update_cache=yes name={{ item }} state=present
+      with_items:
+        - git
+        - python-pip
+        - nginx
+    - name: clone repository
+      git: repo='{{ repository_url }}' dest='{{repository_path }}'
+   
+    - name: install requirements
+      pip: requirements='{{repository_path}}/requirements.txt'  
